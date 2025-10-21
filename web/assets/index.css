@@ -1,0 +1,89 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
+h1 {
+	color: red;
+}
+
+.message {
+	border: 1px solid;
+	padding: 4px;
+	border-radius: 8px;
+	max-width: 300px;
+
+	position: relative;
+}
+
+.dialog-auth-wrapper {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	background-color: rgba(0, 0, 0, 0.3);
+
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.dialog-auth {
+	background-color: #fff;
+	border: 1px solid;
+	border-radius: 8px;
+	padding: 8px;
+}
+
+.dialog-auth button {
+	display: block;
+}
+
+.message-of-mine {
+	margin-left: 35px;
+}
+
+.config-button {
+	position: absolute;
+	top: 6px;
+	right: 6px;
+}
+
+.message-config {
+	position: absolute;
+	width: 100px;
+	height: 40px;
+	border: 1px solid;
+}
+
+.main-page {
+    background-color: #FFCD08;
+    display: flex;
+    align-content: center;
+    align-items: center;
+    font-family: Inter;
+}
+
+.panel {
+    background-color: white;
+    width: 503px;
+    height: 593px;
+    border: 3px solid black;
+    border-radius: 30px;
+}
+
+.panel h1 {
+    color: black;
+    width: 397px;
+    height: 144px;
+    font-weight: 700;
+    font-size: 72px;
+    text-align: center;
+}
+
+.panel-container {
+    margin: 60px 52px;
+}
+
+body {
+    margin: 0;
+}
+
