@@ -57,11 +57,11 @@ h1 {
 
 body {
 	margin: 0;
+	background-color: #FFCD08;
 }
 
 @media (width >= 1200px) {
 	.main-page {
-		background-color: #FFCD08;
 		display: flex;
 		align-content: center;
 		align-items: center;
@@ -119,7 +119,7 @@ body {
 		margin: 0;
 	}
 
-	.join-panel .bottom-form{
+	.join-panel .join-form{
 		display: flex;
 		flex-direction: column;
 		margin-top: 50px;
@@ -139,7 +139,7 @@ body {
 		flex: 1;
 	}
 
-	.input-message {
+	.input-name {
 		width: 100%;
 		box-sizing: border-box;
 		padding-right: 10px;
