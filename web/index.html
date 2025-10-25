@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+    <!DOCTYPE html>
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
@@ -8,13 +8,27 @@
 	</head>
 	<body>
 		<div class="main-page">
-            <img src="../img/hero cat.png" height="810" width="815"/>
+            <div class="main-page-image">
+                <img class="panel-image" src="../img/hero cat.png"/>
+            </div>
             <div class="panel">
                 <div class="panel-container">
-                    <h1>Identify Yourself!</h1>
-                    <p>Pick a name. We promise it's easier than debugging a CSS issue</p>
+                    <div class="panel-h1">
+                        <h1>Identify<br>Yourself!</h1>
+                    </div>
+                    <div class="panel-p">
+                        <p>Pick a name. We promise it's easier than debugging a CSS issue</p>
+                    </div>
                     <div class="join-panel">
-                        <label>Enter your name</label>
+                        <form class="bottom-form">
+                            <label class="panel-label-name">Enter your name</label>
+                            <div class="panel-input-name">
+                                <input class="input-message" type="text" id="name" value="user123" name="user" required>
+                            </div>
+                            <div class="panel-submit-name">
+                                <button class="submit-button" type="submit">Join</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>

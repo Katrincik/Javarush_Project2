@@ -2,6 +2,7 @@
 
 h1 {
 	color: red;
+	margin: 0;
 }
 
 .message {
@@ -54,36 +55,115 @@ h1 {
 	border: 1px solid;
 }
 
-.main-page {
-    background-color: #FFCD08;
-    display: flex;
-    align-content: center;
-    align-items: center;
-    font-family: Inter;
-}
-
-.panel {
-    background-color: white;
-    width: 503px;
-    height: 593px;
-    border: 3px solid black;
-    border-radius: 30px;
-}
-
-.panel h1 {
-    color: black;
-    width: 397px;
-    height: 144px;
-    font-weight: 700;
-    font-size: 72px;
-    text-align: center;
-}
-
-.panel-container {
-    margin: 60px 52px;
-}
-
 body {
-    margin: 0;
+	margin: 0;
 }
 
+@media (width >= 1200px) {
+	.main-page {
+		background-color: #FFCD08;
+		display: flex;
+		align-content: center;
+		align-items: center;
+		font-family: Inter;
+		height: 100vh;
+	}
+
+	.main-page-image {
+		flex: 0 0 56.6%;
+	}
+
+	.panel-image {
+		width: 100%;
+		height: 100%;
+	}
+
+	.panel {
+		background-color: white;
+		width: 503px;
+		/*height: 593px;*/
+		border: 3px solid black;
+		flex: 100%;
+		border-radius: 20px;
+		margin-right: 100px;
+		margin-left: 20px;
+	}
+
+	.panel-container {
+		display: flex;
+		flex-direction: column;
+		margin: 60px 52px;
+	}
+
+	.panel-h1 {
+		flex:1;
+	}
+
+	.panel-h1 h1 {
+		color: black;
+		font-weight: 700;
+		font-size: 72px;
+		text-align: center;
+	}
+
+	.panel-p {
+		flex:1;
+		margin-top: 32px;
+	}
+
+	.panel-p p {
+		color:#646464;
+		font-weight: 400;
+		font-size: 20px;
+		text-align: center;
+		margin: 0;
+	}
+
+	.join-panel .bottom-form{
+		display: flex;
+		flex-direction: column;
+		margin-top: 50px;
+		padding: 32px 24px;
+		border: 1px solid black;
+		border-radius: 8px;
+	}
+
+	.panel-label-name {
+		flex: 1;
+		margin-bottom: 6px;
+		font-size: 16px;
+		font-weight: 500;
+	}
+
+	.panel-input-name {
+		flex: 1;
+	}
+
+	.input-message {
+		width: 100%;
+		box-sizing: border-box;
+		padding-right: 10px;
+		padding-left: 10px;
+		height: 36px;
+		font-size: 16px;
+		color: #646464;
+		background-color: #e7ebee; /*used color picker to identify color*/
+		border: none;
+		border-radius: 4px;
+	}
+
+	.panel-submit-name {
+		flex: 1;
+		margin-top: 24px;
+	}
+
+	.submit-button {
+		width: 100%;
+		height: 36px;
+		background-color: black;
+		color: white;
+		border-radius: 4px;
+		font-weight: 600;
+		font-size: 16px;
+	}
+}
