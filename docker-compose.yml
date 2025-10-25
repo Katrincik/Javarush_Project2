@@ -27,7 +27,7 @@ services:
   backend:
     build:
       context: backend
-      dockerfile: backend/Dockerfile
+      dockerfile: Dockerfile
     container_name: jr-backend
     env_file: backend/.env
     depends_on:
