@@ -2,7 +2,7 @@ body {
     margin: 0;
     padding: 0;
     height: 100%;
-    /*background-color: #F7F8F9;*/
+    background-color: #F7F8F9;
 }
 
 @media (width >= 1200px) {
@@ -53,13 +53,49 @@ body {
         align-items: stretch;
     }
 
-    .input-message {
+    .input-wrapper {
+        position: relative;
         width: 100%;
+    }
+
+    textarea {
+        width: 100%;
+        height: 68px;
         border: 1px solid #C2C2C2;
         border-radius: 16px;
+        padding: 22px 92px 22px 24px;
+        font-size: 16px;
+        font-weight: 400;
         box-sizing: border-box;
-        /*padding: 22px 92px 22px 24px;*/
-        /*font-size: 16px;*/
-        /*font-weight: 400;*/
+        resize: none;
+        overflow-y: hidden;
+        transition: all 0.2s ease;
+        line-height: 150%;
+    }
+
+    .submit-message-button {
+        position: absolute;
+        right: 24px;
+        top: 47%;
+        transform: translateY(-50%);
+        background-color: #5856D6;
+        border: none;
+        border-radius: 50%;
+        width: 44px;
+        height: 44px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .submit-message-button img {
+        width: 24px;
+        height: 24px;
+        pointer-events: none;
+    }
+
+    .submit-message-button:hover {
+        transform: translateY(-50%) scale(1.05);
     }
 }

@@ -7,10 +7,10 @@
         <link rel="stylesheet" href="./assets/chat.css" />
     </head>
     <body>
-        <div class="chat-page">
+        <div id="root" class="chat-page">
             <div class="chat-header">
                 <header>
-                    <
+                    Smth
                 </header>
             </div>
             <div class="chat-messages">
@@ -24,13 +24,17 @@
                     </div>
                     <div class="message-input-form">
                         <form class="bottom-form">
-                            <textarea class="input-message" placeholder="Enter your message..."></textarea>
-<!--                            <button type="submit"></button>-->
+                            <div class="input-wrapper">
+                                <textarea class="input-message" placeholder="Enter your message..."></textarea>
+                                <button type="submit" class="submit-message-button">
+                                    <img src="../img/send.png" alt="Send" />
+                                </button>
+                            </div>
                         </form>
                     </div>
                 </div>
             </div>
         </div>
-        <script src="/assets/index.js"></script>
+        <script src="./assets/index.js"></script>
     </body>
 </html>

@@ -9,6 +9,23 @@ let inoutMessageElement = null;
 let messageConfigBlock = null;
 let messageConfigIsOpened = false;
 
+const textarea = document.querySelector("textarea");
+const baseHeight = 68;
+const expandedHeight = 96;
+
+textarea.addEventListener("input", () => {
+	textarea.style.height = "auto";
+
+	if (textarea.scrollHeight > baseHeight * 1.45) {
+		textarea.style.height = expandedHeight + "px";
+		textarea.style.padding = "12px 92px 12px 24px";
+	} else {
+		textarea.style.height = baseHeight + "px";
+		textarea.style.padding = "22px 92px 22px 24px";
+	}
+});
+
+
 const initBottomFormMessage = () => {
 	formMessageElement = document.createElement("form");
 	formMessageElement.classList.add("bottom-form");
