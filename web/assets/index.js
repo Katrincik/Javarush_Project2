@@ -1,270 +1,354 @@
-// console.log(1000);
+document.addEventListener("DOMContentLoaded", () => {
+	document.body.innerHTML = "";
 
-const root = document.getElementById("root");
-const user = localStorage.getItem("user");
-let formMessageElement = null;
-let messagesWrapperDiv = null;
-let inputValue = null;
-let inoutMessageElement = null;
-let messageConfigBlock = null;
-let messageConfigIsOpened = false;
+	const user = JSON.parse(localStorage.getItem("user") || "null");
 
-const textarea = document.querySelector("textarea");
-const baseHeight = 68;
-const expandedHeight = 96;
+	const root = document.createElement("div");
+	root.id = "root";
+	root.classList.add("chat-page");
 
-textarea.addEventListener("input", () => {
-	textarea.style.height = "auto";
+	// Header
+	const chatHeader = document.createElement("div");
+	chatHeader.classList.add("chat-header");
+	const header = document.createElement("header");
+	chatHeader.appendChild(header);
 
-	if (textarea.scrollHeight > baseHeight * 1.45) {
-		textarea.style.height = expandedHeight + "px";
-		textarea.style.padding = "12px 92px 12px 24px";
-	} else {
-		textarea.style.height = baseHeight + "px";
-		textarea.style.padding = "22px 92px 22px 24px";
-	}
-});
+	const avatarChat = document.createElement("div");
+	avatarChat.classList.add("avatar-chat");
 
+	const profileButton = document.createElement("button");
+	profileButton.classList.add("profile-button");
 
-const initBottomFormMessage = () => {
-	formMessageElement = document.createElement("form");
-	formMessageElement.classList.add("bottom-form");
+	const imgProfileButton = document.createElement("img");
+	imgProfileButton.src = "../img/Vector.png";
+	imgProfileButton.alt = "Open profile";
+	profileButton.appendChild(imgProfileButton);
 
-	inoutMessageElement = document.createElement("input");
-	inoutMessageElement.placeholder = "Enter your message";
-	inoutMessageElement.classList.add("input-message");
-	if (inputValue) inoutMessageElement.value = inputValue;
+	const headerChatName = document.createElement("div");
+	headerChatName.classList.add("header-chat-name");
 
-	inoutMessageElement.addEventListener("input", function (event) {
-		const value = event.target.value;
-		inputValue = value;
-	});
+	const chatName = document.createElement("p");
+	chatName.classList.add("chat-name");
+	chatName.innerText = "The CSS Whisperer"
+
+	const online = document.createElement("p");
+	online.classList.add("online");
+	online.innerText = "Online";
+
+	const userAvatarImg = document.createElement("img");
+	const avatarSrc = user.avatar || "../img/54279169a30dad0cbbd19437ba4d81b26ecdc003.jpg";
+	userAvatarImg.setAttribute("src", avatarSrc);
+	userAvatarImg.setAttribute("width", 42);
+	userAvatarImg.setAttribute("height", 42);
+	userAvatarImg.classList.add("user-avatar");
+
+	avatarChat.appendChild(userAvatarImg);
+
+	headerChatName.appendChild(chatName);
+	headerChatName.appendChild(online);
+
+	avatarChat.appendChild(headerChatName);
+	header.appendChild(avatarChat);
+	header.appendChild(profileButton);
+	root.appendChild(chatHeader);
+
+	// Chat messages container
+	const chatMessages = document.createElement("div");
+	chatMessages.classList.add("chat-messages");
+
+	// Messages wrapper
+	const messagesWrapper = document.createElement("div");
+	messagesWrapper.classList.add("messages-wrapper");
+	chatMessages.appendChild(messagesWrapper);
+
+	// Message input form section
+	const messageInputForm = document.createElement("div");
+	messageInputForm.classList.add("message-input-form");
+	chatMessages.appendChild(messageInputForm);
+
+	const form = document.createElement("form");
+	form.classList.add("bottom-form");
+
+	const inputWrapper = document.createElement("div");
+	inputWrapper.classList.add("input-wrapper");
+
+	const textarea = document.createElement("textarea");
+	textarea.classList.add("input-message");
+	textarea.placeholder = "Enter your message...";
 
 	const button = document.createElement("button");
-	button.innerText = "Send";
+	button.type = "submit";
+	button.classList.add("submit-message-button");
 
-	formMessageElement.appendChild(inoutMessageElement);
-	formMessageElement.appendChild(button);
+	const img = document.createElement("img");
+	img.src = "../img/send.png";
+	img.alt = "Send";
+	button.appendChild(img);
 
-	root.appendChild(formMessageElement);
+	inputWrapper.appendChild(textarea);
+	inputWrapper.appendChild(button);
+	form.appendChild(inputWrapper);
+	messageInputForm.appendChild(form);
 
-	formMessageElement.addEventListener("submit", async function (event) {
-		try {
-			event.preventDefault();
-			const content = event.target[0].value;
+	// messagesWrapper.appendChild(messageInputForm);
+	root.appendChild(chatMessages);
+	document.body.appendChild(root);
 
-			const username = JSON.parse(user).username;
+	let formMessageElement = null;
+	let messagesWrapperDiv = null;
 
-			const messageObject = {
-				username,
-				content,
-			};
+	let inputValue = " ";
+	let inoutMessageElement = null;
+	let messageConfigBlock = null;
+	let messageConfigIsOpened = false;
 
-			const response = await fetch("/api/message", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify(messageObject),
-			});
-			const data = await response.json();
-			console.log("data: ", data);
-			document.location.reload();
-		} catch (error) {
-			console.log("ERROR: ", error);
+	const baseHeight = 68;  // 2 lines
+	const expandedHeight = 96;  // 3+ lines
+
+	textarea.addEventListener("input", () => {
+		textarea.style.height = "auto";
+
+		if (textarea.scrollHeight > baseHeight * 1.45) {
+			textarea.style.height = expandedHeight + "px";
+			textarea.style.padding = "12px 92px 12px 24px";
+		} else {
+			textarea.style.height = baseHeight + "px";
+			textarea.style.padding = "22px 92px 22px 24px";
 		}
 	});
-};
 
-const initFetchMessages = () => {
-	return fetch(`/api/messages`)
-		.then((res) => res.json())
-		.then((body) => {
-			console.log("messages: ", body.messages);
 
-			const messages = body.messages;
+	const initBottomFormMessage = () => {
+		formMessageElement = form;
+		inoutMessageElement = textarea;
 
-			messagesWrapperDiv = document.createElement("div");
-			messagesWrapperDiv.classList.add("messages-wrapper");
-
-			root.appendChild(messagesWrapperDiv);
-
-			messages.forEach((message) => {
-				const isUserAuthorOfMessage =
-					message.username == JSON.parse(user).username;
-				const messageDiv = document.createElement("div");
-				messageDiv.classList.add("message");
-				if (isUserAuthorOfMessage) {
-					messageDiv.classList.add("message-of-mine");
-
-					const messageConfigButton = document.createElement("button");
-					messageConfigButton.innerText = "config";
-					messageConfigButton.classList.add("config-button");
-					messageDiv.appendChild(messageConfigButton);
-
-					messageConfigButton.addEventListener("click", function (event) {
-						if (messageConfigIsOpened) destroyMessageConfig();
-						const { clientX: xCoord, clientY: yCoord } = event;
-						console.log("xCoord: ", xCoord, " yCoord: ", yCoord);
-
-						messageConfigBlock = document.createElement("div");
-						messageConfigBlock.classList.add("message-config");
-						messageConfigBlock.style.top = yCoord + "px";
-						messageConfigBlock.style.left = xCoord + "px";
-
-						const buttonEdit = document.createElement("button");
-						const buttonDelete = document.createElement("button");
-						buttonEdit.innerText = "Edit";
-						buttonDelete.innerText = "Delete";
-
-						messageConfigBlock.appendChild(buttonEdit);
-						messageConfigBlock.appendChild(buttonDelete);
-
-						buttonEdit.addEventListener("click", function (event) {
-							const currentMessage = message;
-							inputValue = currentMessage.content;
-							inoutMessageElement.value = currentMessage.content;
-						});
-
-						root.appendChild(messageConfigBlock);
-						messageConfigIsOpened = !messageConfigIsOpened;
-					});
-				}
-
-				const messageP = document.createElement("p");
-				messageP.innerHTML = message.content;
-
-				const messageAvatarImg = document.createElement("img");
-				messageAvatarImg.setAttribute("src", message.avatar);
-				messageAvatarImg.setAttribute("width", 32);
-				messageAvatarImg.setAttribute("height", 32);
-
-				const messageUsernameP = document.createElement("p");
-				messageUsernameP.innerText = message.username;
-
-				messageDiv.appendChild(messageAvatarImg);
-				messageDiv.appendChild(messageUsernameP);
-				messageDiv.appendChild(messageP);
-
-				messagesWrapperDiv.appendChild(messageDiv);
-			});
-
-			if (user) initBottomFormMessage();
-		});
-};
-
-const destroyOldContent = () => {
-	root.removeChild(messagesWrapperDiv);
-	root.removeChild(formMessageElement);
-	messagesWrapperDiv = null;
-	formMessageElement = null;
-};
-
-const destroyMessageConfig = () => {
-	root.removeChild(messageConfigBlock);
-	messageConfigBlock = null;
-	messageConfigIsOpened = false;
-};
-
-if (!user) {
-	const headerNonAuth = document.createElement("header");
-	headerNonAuth.innerText = "The CSS Whisperer";
-	root.appendChild(headerNonAuth);
-
-	const buttonForCallingAuthDialog = document.createElement("button");
-	buttonForCallingAuthDialog.innerText = "Log in";
-	headerNonAuth.appendChild(buttonForCallingAuthDialog);
-
-	buttonForCallingAuthDialog.addEventListener("click", function (event) {
-		event.preventDefault();
-
-		const dialogForAuthWrapper = document.createElement("div");
-		dialogForAuthWrapper.classList.add("dialog-auth-wrapper");
-		const dialogForAuth = document.createElement("div");
-		dialogForAuth.classList.add("dialog-auth");
-
-		const formForAuth = document.createElement("form");
-		const inputForAuth = document.createElement("input");
-		const buttonSubmitAuth = document.createElement("button");
-		buttonSubmitAuth.innerText = "Log in";
-		const buttonLeaveAuth = document.createElement("button");
-		buttonLeaveAuth.innerText = "Close";
-
-		formForAuth.appendChild(inputForAuth);
-		formForAuth.appendChild(buttonSubmitAuth);
-		formForAuth.appendChild(buttonLeaveAuth);
-
-		dialogForAuth.appendChild(formForAuth);
-
-		dialogForAuthWrapper.appendChild(dialogForAuth);
-		root.appendChild(dialogForAuthWrapper);
-
-		formForAuth.addEventListener("submit", async function (event) {
+		formMessageElement.addEventListener("submit", async function (event) {
 			try {
 				event.preventDefault();
-				const username = event.target[0].value;
-				console.log("username: ", username);
+				const content = inoutMessageElement.value.trim();
+				if (!content) return;
 
-				const response = await fetch(`/api/user?username=${username}`);
+				const username = user.username;
+
+				const messageObject = {
+					username,
+					content,
+				};
+
+				const response = await fetch("/api/message", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify(messageObject),
+				});
 				const data = await response.json();
 				console.log("data: ", data);
-				const user = data.user;
-				localStorage.setItem("user", JSON.stringify(user));
 				document.location.reload();
 			} catch (error) {
-				alert(error);
+				console.log("ERROR: ", error);
 			}
 		});
-	});
-} else {
-	const headerNonAuth = document.createElement("header");
-	headerNonAuth.innerText = "Вы авторизовались";
+	};
 
-	root.appendChild(headerNonAuth);
+	const initFetchMessages = () => {
+		return fetch(`/api/messages`)
+			.then((res) => res.json())
+			.then((body) => {
+				console.log("messages: ", body.messages);
 
-	// initBottomFormMessage();
-}
+				const messages = body.messages;
 
-initFetchMessages();
-// setInterval(() => {
-// 	destroyOldContent();
-// 	initFetchMessages();
-// }, 5000);
+				messagesWrapper.querySelectorAll(".message").forEach((m) => m.remove());
 
-// fetch(`/api/messages`)
-// 	.then((res) => res.json())
-// 	.then((body) => {
-// 		console.log("messages: ", body.messages);
+				messages.forEach((message) => {
+					const isUserAuthorOfMessage =
+						user && message.username === user.username;
 
-// 		const messages = body.messages;
+					const messageDiv = document.createElement("div");
+					messageDiv.classList.add("message");
 
-// 		const messagesWrapperDiv = document.createElement("div");
-// 		messagesWrapperDiv.classList.add("messages-wrapper");
+					if (isUserAuthorOfMessage) {
+						messageDiv.classList.add("message-of-mine");
 
-// 		root.appendChild(messagesWrapperDiv);
+						const messageConfigButton = document.createElement("button");
+						messageConfigButton.innerText = "config";
+						messageConfigButton.classList.add("config-button");
+						messageDiv.appendChild(messageConfigButton);
 
-// 		messages.forEach((message) => {
-// 			const messageDiv = document.createElement("div");
-// 			messageDiv.classList.add("message");
+						messageConfigButton.addEventListener("click", function (event) {
+							if (messageConfigIsOpened) destroyMessageConfig();
+							const { clientX: xCoord, clientY: yCoord } = event;
+							console.log("xCoord: ", xCoord, " yCoord: ", yCoord);
 
-// 			const messageP = document.createElement("p");
-// 			messageP.innerHTML = message.content;
+							messageConfigBlock = document.createElement("div");
+							messageConfigBlock.classList.add("message-config");
+							messageConfigBlock.style.top = yCoord + "px";
+							messageConfigBlock.style.left = xCoord + "px";
 
-// 			const messageAvatarImg = document.createElement("img");
-// 			messageAvatarImg.setAttribute("src", message.avatar);
-// 			messageAvatarImg.setAttribute("width", 32);
-// 			messageAvatarImg.setAttribute("height", 32);
+							const buttonEdit = document.createElement("button");
+							const buttonDelete = document.createElement("button");
+							buttonEdit.innerText = "Edit";
+							buttonDelete.innerText = "Delete";
 
-// 			const messageUsernameP = document.createElement("p");
-// 			messageUsernameP.innerText = message.username;
-// 			// messageDiv.innerText = message.content;
+							messageConfigBlock.appendChild(buttonEdit);
+							messageConfigBlock.appendChild(buttonDelete);
 
-// 			messageDiv.appendChild(messageAvatarImg);
-// 			messageDiv.appendChild(messageUsernameP);
-// 			messageDiv.appendChild(messageP);
+							buttonEdit.addEventListener("click", function (event) {
+								const currentMessage = message;
+								inputValue = currentMessage.content;
+								inoutMessageElement.value = currentMessage.content;
+							});
 
-// 			messagesWrapperDiv.appendChild(messageDiv);
-// 		});
+							root.appendChild(messageConfigBlock);
+							messageConfigIsOpened = !messageConfigIsOpened;
+						});
+					}
 
-// 		if (user) initBottomFormMessage();
-// 	});
+					const rawDate = message.created_at;
+					console.log("created_at raw:", rawDate);
+
+					let createdAt;
+
+					if (typeof rawDate === "string" && rawDate.includes(" ")) {
+						createdAt = new Date(rawDate.replace(" ", "T"));
+					} else {
+						createdAt = new Date(rawDate);
+					}
+
+					if (isNaN(createdAt.getTime())) {
+						console.warn("Invalid date format for:", rawDate);
+						return;
+					}
+
+					const now = new Date();
+
+					let timeString;
+					if (
+						createdAt.getFullYear() === now.getFullYear() &&
+						createdAt.getMonth() === now.getMonth() &&
+						createdAt.getDate() === now.getDate()
+					) {
+						timeString = createdAt.toLocaleTimeString([], {
+							hour: "2-digit",
+							minute: "2-digit",
+						});
+					} else {
+						timeString = createdAt.toLocaleString("en-GB", {
+							day: "numeric",
+							month: "short",
+							hour: "2-digit",
+							minute: "2-digit",
+						});
+					}
+
+					const messageData = document.createElement("div");
+					messageData.classList.add("message-data");
+
+					const userAndTime = document.createElement("div");
+					userAndTime.classList.add("message-meta");
+
+					const messageTimeP = document.createElement("p");
+					messageTimeP.classList.add("message-time");
+					messageTimeP.innerText = timeString;
+
+					const messageP = document.createElement("p");
+					messageP.innerHTML = message.content;
+
+					const messageAvatarImg = document.createElement("img");
+					messageAvatarImg.setAttribute("src", message.avatar);
+					messageAvatarImg.setAttribute("width", 32);
+					messageAvatarImg.setAttribute("height", 32);
+
+					const messageUsernameP = document.createElement("p");
+					messageUsernameP.classList.add("message-username");
+					messageUsernameP.innerText = message.username;
+					// messageData.appendChild(messageUsernameP);
+
+					userAndTime.appendChild(messageUsernameP);
+					userAndTime.appendChild(messageTimeP);
+
+					messageDiv.appendChild(messageAvatarImg);
+					// messageDiv.appendChild(userAndTime);
+					// messageDiv.appendChild(messageP);
+					messageData.appendChild(userAndTime);
+					messageData.appendChild(messageP);
+					messageDiv.appendChild(messageData);
+					messagesWrapper.appendChild(messageDiv);
+				});
+
+				if (user) initBottomFormMessage();
+			});
+	};
+
+	// const destroyOldContent = () => {
+	// 	root.removeChild(messagesWrapperDiv);
+	// 	root.removeChild(formMessageElement);
+	// 	messagesWrapperDiv = null;
+	// 	formMessageElement = null;
+	// };
+
+	const destroyMessageConfig = () => {
+		if (messageConfigBlock) {
+			root.removeChild(messageConfigBlock);
+			messageConfigBlock = null;
+			messageConfigIsOpened = false;
+		}
+	};
+
+	if (!user) {
+		const headerNonAuth = document.createElement("header");
+		headerNonAuth.innerText = "The CSS Whisperer";
+		root.appendChild(headerNonAuth);
+
+		const buttonForCallingAuthDialog = document.createElement("button");
+		buttonForCallingAuthDialog.innerText = "Log in";
+		headerNonAuth.appendChild(buttonForCallingAuthDialog);
+
+		buttonForCallingAuthDialog.addEventListener("click", function (event) {
+			event.preventDefault();
+
+			const dialogForAuthWrapper = document.createElement("div");
+			dialogForAuthWrapper.classList.add("dialog-auth-wrapper");
+			const dialogForAuth = document.createElement("div");
+			dialogForAuth.classList.add("dialog-auth");
+
+			const formForAuth = document.createElement("form");
+			const inputForAuth = document.createElement("input");
+			const buttonSubmitAuth = document.createElement("button");
+			buttonSubmitAuth.innerText = "Log in";
+			const buttonLeaveAuth = document.createElement("button");
+			buttonLeaveAuth.innerText = "Close";
+
+			formForAuth.appendChild(inputForAuth);
+			formForAuth.appendChild(buttonSubmitAuth);
+			formForAuth.appendChild(buttonLeaveAuth);
+
+			dialogForAuth.appendChild(formForAuth);
+
+			dialogForAuthWrapper.appendChild(dialogForAuth);
+			root.appendChild(dialogForAuthWrapper);
+
+			formForAuth.addEventListener("submit", async function (event) {
+				try {
+					event.preventDefault();
+					const username = event.target[0].value;
+					console.log("username: ", username);
+
+					const response = await fetch(`/api/user?username=${username}`);
+					const data = await response.json();
+					console.log("data: ", data);
+					const user = data.user;
+					localStorage.setItem("user", JSON.stringify(user));
+					document.location.reload();
+				} catch (error) {
+					alert(error);
+				}
+			});
+			buttonLeaveAuth.addEventListener("click", () =>
+				dialogForAuthWrapper.remove()
+			);
+		});
+	}
+	initFetchMessages();
+});
