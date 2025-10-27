@@ -23,6 +23,9 @@ const BASE_URL = process.env.BASE_URL;
 const app = express();
 app.use(bodyParser.json());
 
+app.use("/img", express.static(path.join(process.cwd(), "img")));
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
+
 const pool = new Pool({
 	host: process.env.DB_HOST,
 	port: parseInt(process.env.DB_PORT || ""),
@@ -172,7 +175,7 @@ app.get("/user", async (req, res) => {
 
 		res.status(200).json({ user: users[0] });
 	} catch (error: any) {
-		res.status(400).send(error.message);
+		res.status(400).json({ error: error.message });
 	}
 });
 
@@ -282,13 +285,20 @@ app.patch("/user", upload.single("avatar"), async (req, res) => {
 app.get("/messages", async (req, res) => {
 	try {
 		const { rows: messages } = await pool.query(`
-			SELECT messages.uuid AS uuid,
-messages.content AS content,
-messages.updated_at AS updated_at,
-users.username AS username,
-users.avatar AS avatar,
-CASE WHEN messages.created_at = messages.updated_at THEN 'false' ELSE 'true' END AS was_edited
- FROM messages LEFT JOIN users ON users.uuid = messages.author_uuid;
+			SELECT
+				messages.uuid AS uuid,
+				messages.content AS content,
+				messages.created_at AS created_at,       
+				messages.updated_at AS updated_at,
+				users.username AS username,
+				users.avatar AS avatar,
+				CASE
+					WHEN messages.created_at = messages.updated_at THEN false
+					ELSE true
+					END AS was_edited
+			FROM messages
+					 LEFT JOIN users ON users.uuid = messages.author_uuid
+			ORDER BY messages.created_at ASC;
 			`);
 		res.status(200).json({ messages });
 	} catch (error: any) {
