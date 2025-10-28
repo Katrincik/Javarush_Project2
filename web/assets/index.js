@@ -168,43 +168,6 @@ document.addEventListener("DOMContentLoaded", () => {
 					const messageDiv = document.createElement("div");
 					messageDiv.classList.add("message");
 
-					if (isUserAuthorOfMessage) {
-						messageDiv.classList.add("message-of-mine");
-
-						const messageConfigButton = document.createElement("button");
-						messageConfigButton.innerText = "config";
-						messageConfigButton.classList.add("config-button");
-						messageDiv.appendChild(messageConfigButton);
-
-						messageConfigButton.addEventListener("click", function (event) {
-							if (messageConfigIsOpened) destroyMessageConfig();
-							const { clientX: xCoord, clientY: yCoord } = event;
-							console.log("xCoord: ", xCoord, " yCoord: ", yCoord);
-
-							messageConfigBlock = document.createElement("div");
-							messageConfigBlock.classList.add("message-config");
-							messageConfigBlock.style.top = yCoord + "px";
-							messageConfigBlock.style.left = xCoord + "px";
-
-							const buttonEdit = document.createElement("button");
-							const buttonDelete = document.createElement("button");
-							buttonEdit.innerText = "Edit";
-							buttonDelete.innerText = "Delete";
-
-							messageConfigBlock.appendChild(buttonEdit);
-							messageConfigBlock.appendChild(buttonDelete);
-
-							buttonEdit.addEventListener("click", function (event) {
-								const currentMessage = message;
-								inputValue = currentMessage.content;
-								inoutMessageElement.value = currentMessage.content;
-							});
-
-							root.appendChild(messageConfigBlock);
-							messageConfigIsOpened = !messageConfigIsOpened;
-						});
-					}
-
 					const rawDate = message.created_at;
 					console.log("created_at raw:", rawDate);
 
@@ -255,10 +218,26 @@ document.addEventListener("DOMContentLoaded", () => {
 					const messageP = document.createElement("p");
 					messageP.innerHTML = message.content;
 
+					const avatarList = [
+						"../img/31e2d13181abbd6c6e1fb445f4c83b55c0222b14.png",
+						"../img/30368c044177b597a7615e10db62f1a9aed756aa.png",
+						"../img/981820c6d6fb5c2f063baf30cebd6701584a651c.png",
+					];
+
+					function getConsistentAvatar(username) {
+						let sum = 0;
+						for (let i = 0; i < username.length; i++) {
+							sum += username.charCodeAt(i);
+						}
+						return avatarList[sum % avatarList.length];
+					}
+
 					const messageAvatarImg = document.createElement("img");
-					messageAvatarImg.setAttribute("src", message.avatar);
+					const avatarImage = message.avatar || getConsistentAvatar(message.username);
+					messageAvatarImg.setAttribute("src", avatarImage);
 					messageAvatarImg.setAttribute("width", 32);
 					messageAvatarImg.setAttribute("height", 32);
+					messageAvatarImg.classList.add("message-avatar-img");
 
 					const messageUsernameP = document.createElement("p");
 					messageUsernameP.classList.add("message-username");
@@ -267,16 +246,70 @@ document.addEventListener("DOMContentLoaded", () => {
 
 					userAndTime.appendChild(messageUsernameP);
 					userAndTime.appendChild(messageTimeP);
-
-					messageDiv.appendChild(messageAvatarImg);
 					// messageDiv.appendChild(userAndTime);
 					// messageDiv.appendChild(messageP);
 					messageData.appendChild(userAndTime);
 					messageData.appendChild(messageP);
+
+					if (isUserAuthorOfMessage) {
+						messageDiv.classList.add("message-of-mine");
+
+						const messageConfigButton = document.createElement("button");
+						// messageConfigButton.innerText = "config";
+						const configButton = document.createElement("img");
+						configButton.src = "../img/Vector2.png";
+						messageConfigButton.appendChild(configButton);
+						messageConfigButton.classList.add("config-button");
+						// messageDiv.appendChild(messageConfigButton);
+						userAndTime.appendChild(messageConfigButton);
+
+						messageConfigButton.addEventListener("click", function (event) {
+							if (messageConfigIsOpened) destroyMessageConfig();
+							const { clientX: xCoord, clientY: yCoord } = event;
+							console.log("xCoord: ", xCoord, " yCoord: ", yCoord);
+
+							messageConfigBlock = document.createElement("div");
+							messageConfigBlock.classList.add("message-config");
+							messageConfigBlock.style.top = yCoord + "px";
+							messageConfigBlock.style.left = xCoord + "px";
+
+							const buttonEdit = document.createElement("button");
+							const buttonDelete = document.createElement("button");
+							buttonEdit.innerText = "Edit";
+							buttonDelete.innerText = "Delete";
+
+							messageConfigBlock.appendChild(buttonEdit);
+							messageConfigBlock.appendChild(buttonDelete);
+
+							buttonEdit.addEventListener("click", function (event) {
+								const currentMessage = message;
+								inputValue = currentMessage.content;
+								inoutMessageElement.value = currentMessage.content;
+							});
+
+							messageDiv.appendChild(messageConfigBlock);
+							messageConfigIsOpened = true;
+
+							setTimeout(() => {
+								document.addEventListener("click", handleOutsideClick);
+							}, 0);
+						});
+						function handleOutsideClick(e) {
+							// If click is not inside the menu or on the config button → close it
+							if (
+								messageConfigBlock &&
+								!messageConfigBlock.contains(e.target) &&
+								!e.target.classList.contains("config-button")
+							) {
+								destroyMessageConfig();
+								document.removeEventListener("click", handleOutsideClick);
+							}
+						}
+					}
+					messageDiv.appendChild(messageAvatarImg);
 					messageDiv.appendChild(messageData);
 					messagesWrapper.appendChild(messageDiv);
 				});
-
 				if (user) initBottomFormMessage();
 			});
 	};
