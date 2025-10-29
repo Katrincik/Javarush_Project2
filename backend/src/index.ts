@@ -323,18 +323,55 @@ app.post(`/message`, async (req, res) => {
 			[username]
 		);
 
-		await pool.query(
+		// await pool.query(
+		// 	`
+		// 	INSERT INTO messages(content, author_uuid) VALUES($1, $2)
+		// 	`,
+		// 	[content, users[0].uuid]
+		// );
+		//
+		// const { rows: messages } = await pool.query(`
+		// 	SELECT * FROM messages WHERE author_uuid = 'cbcdb9e9-c074-4bff-ba6d-7e341d716a82' ORDER BY created_at DESC;
+		// 	`);
+
+		if (users.length === 0) throw new Error("User not found");
+
+		const { rows } = await pool.query(
 			`
-			INSERT INTO messages(content, author_uuid) VALUES($1, $2)
+			INSERT INTO messages(content, author_uuid)
+			VALUES($1, $2)
+			RETURNING uuid, content, author_uuid, created_at, updated_at;
 			`,
 			[content, users[0].uuid]
 		);
 
-		const { rows: messages } = await pool.query(`
-			SELECT * FROM messages WHERE author_uuid = 'cbcdb9e9-c074-4bff-ba6d-7e341d716a82' ORDER BY created_at DESC;
-			`);
+		const message = rows[0];
 
-		res.status(200).json({ message: messages[0] });
+		res.status(200).json({ message });
+		// res.status(200).json({ message: messages[0] });
+	} catch (error: any) {
+		res.status(400).send(error.message);
+	}
+});
+
+app.patch("/message/:uuid", async (req, res) => {
+	try {
+		const { uuid } = req.params;
+		const { content } = req.body;
+
+		if (!content) throw new Error("No content provided");
+
+		await pool.query(
+			`UPDATE messages SET content = $1, updated_at = NOW() WHERE uuid = $2`,
+			[content, uuid]
+		);
+
+		const { rows } = await pool.query(
+			`SELECT * FROM messages WHERE uuid = $1`,
+			[uuid]
+		);
+
+		res.status(200).json({ message: rows[0] });
 	} catch (error: any) {
 		res.status(400).send(error.message);
 	}

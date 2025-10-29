@@ -95,7 +95,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	document.body.appendChild(root);
 
 	let formMessageElement = null;
-	let messagesWrapperDiv = null;
+	// let messagesWrapperDiv = null;
 
 	let inputValue = " ";
 	let inoutMessageElement = null;
@@ -118,6 +118,8 @@ document.addEventListener("DOMContentLoaded", () => {
 	});
 
 
+	let editingMessageId = null;
+
 	const initBottomFormMessage = () => {
 		formMessageElement = form;
 		inoutMessageElement = textarea;
@@ -130,18 +132,29 @@ document.addEventListener("DOMContentLoaded", () => {
 
 				const username = user.username;
 
-				const messageObject = {
-					username,
-					content,
-				};
+				// const messageObject = {
+				// 	username,
+				// 	content,
+				// };
 
-				const response = await fetch("/api/message", {
-					method: "POST",
-					headers: {
-						"Content-Type": "application/json",
-					},
-					body: JSON.stringify(messageObject),
-				});
+				let response;
+
+				if (editingMessageId) {
+					// PATCH existing message
+					response = await fetch(`/api/message/${editingMessageId}`, {
+						method: "PATCH",
+						headers: {"Content-Type": "application/json"},
+						body: JSON.stringify({content}),
+					});
+					editingMessageId = null;
+				} else {
+					response = await fetch("/api/message", {
+						method: "POST",
+						headers: {"Content-Type": "application/json"},
+						body: JSON.stringify({username, content}),
+					});
+				}
+
 				const data = await response.json();
 				console.log("data: ", data);
 				document.location.reload();
@@ -282,9 +295,9 @@ document.addEventListener("DOMContentLoaded", () => {
 							messageConfigBlock.appendChild(buttonDelete);
 
 							buttonEdit.addEventListener("click", function (event) {
-								const currentMessage = message;
-								inputValue = currentMessage.content;
-								inoutMessageElement.value = currentMessage.content;
+								inputValue = message.content;
+								inoutMessageElement.value = message.content;
+								editingMessageId = message.uuid;
 							});
 
 							messageDiv.appendChild(messageConfigBlock);
