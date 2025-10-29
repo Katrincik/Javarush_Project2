@@ -300,6 +300,20 @@ document.addEventListener("DOMContentLoaded", () => {
 								editingMessageId = message.uuid;
 							});
 
+							buttonDelete.addEventListener("click", async function (){
+								const response = await fetch(`/api/message/${message.uuid}`, {
+									method: "DELETE",
+								});
+
+								if (!response.ok) {
+									throw new Error("Failed to delete message");
+								}
+
+								messageDiv.remove();
+
+								console.log(`Message ${message.uuid} deleted`);
+							})
+
 							messageDiv.appendChild(messageConfigBlock);
 							messageConfigIsOpened = true;
 

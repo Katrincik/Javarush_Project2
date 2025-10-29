@@ -377,6 +377,30 @@ app.patch("/message/:uuid", async (req, res) => {
 	}
 });
 
+app.delete("/message/:uuid", async (req, res) => {
+	try {
+		const { uuid } = req.params;
+
+		if (!uuid) throw new Error("Message ID (uuid) is required");
+
+		const { rows: existing } = await pool.query(
+			`SELECT * FROM messages WHERE uuid = $1`,
+			[uuid]
+		);
+
+		if (existing.length === 0) {
+			return res.status(404).json({ error: "Message not found" });
+		}
+
+		await pool.query(`DELETE FROM messages WHERE uuid = $1`, [uuid]);
+
+		res.status(200).json({ success: true, deletedId: uuid });
+	} catch (error: any) {
+		res.status(400).json({ error: error.message });
+	}
+});
+
+
 init().then(() => {
 	app.listen(PORT, () => {
 		console.log("APP IS RUNNING ON PORT: " + PORT);
