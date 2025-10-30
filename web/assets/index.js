@@ -61,6 +61,10 @@ document.addEventListener("DOMContentLoaded", () => {
 	messagesWrapper.classList.add("messages-wrapper");
 	chatMessages.appendChild(messagesWrapper);
 
+	const spacer = document.createElement("div");
+	spacer.classList.add("spacer");
+	messagesWrapper.appendChild(spacer);
+
 	// Message input form section
 	const messageInputForm = document.createElement("div");
 	messageInputForm.classList.add("message-input-form");
@@ -117,7 +121,6 @@ document.addEventListener("DOMContentLoaded", () => {
 		}
 	});
 
-
 	let editingMessageId = null;
 
 	const initBottomFormMessage = () => {
@@ -158,6 +161,9 @@ document.addEventListener("DOMContentLoaded", () => {
 				const data = await response.json();
 				console.log("data: ", data);
 				document.location.reload();
+				// inoutMessageElement.value = "";
+				// await initFetchMessages();
+				// messagesWrapper.scrollTop = messagesWrapper.scrollHeight;
 			} catch (error) {
 				console.log("ERROR: ", error);
 			}
@@ -175,6 +181,21 @@ document.addEventListener("DOMContentLoaded", () => {
 				messagesWrapper.querySelectorAll(".message").forEach((m) => m.remove());
 
 				messages.forEach((message) => {
+					let createdAt = new Date(message.created_at);
+					let now = new Date();
+
+					const isToday =
+						createdAt.getFullYear() === now.getFullYear() &&
+						createdAt.getMonth() === now.getMonth() &&
+						createdAt.getDate() === now.getDate();
+
+					if (isToday && !document.querySelector(".today-separator")) {
+						const todaySeparator = document.createElement("p");
+						todaySeparator.classList.add("today-separator");
+						todaySeparator.innerText = "Today";
+						messagesWrapper.appendChild(todaySeparator);
+					}
+
 					const isUserAuthorOfMessage =
 						user && message.username === user.username;
 
@@ -183,8 +204,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 					const rawDate = message.created_at;
 					console.log("created_at raw:", rawDate);
-
-					let createdAt;
 
 					if (typeof rawDate === "string" && rawDate.includes(" ")) {
 						createdAt = new Date(rawDate.replace(" ", "T"));
@@ -197,14 +216,8 @@ document.addEventListener("DOMContentLoaded", () => {
 						return;
 					}
 
-					const now = new Date();
-
 					let timeString;
-					if (
-						createdAt.getFullYear() === now.getFullYear() &&
-						createdAt.getMonth() === now.getMonth() &&
-						createdAt.getDate() === now.getDate()
-					) {
+					if (isToday) {
 						timeString = createdAt.toLocaleTimeString([], {
 							hour: "2-digit",
 							minute: "2-digit",
@@ -281,10 +294,12 @@ document.addEventListener("DOMContentLoaded", () => {
 							const { clientX: xCoord, clientY: yCoord } = event;
 							console.log("xCoord: ", xCoord, " yCoord: ", yCoord);
 
+							messageDiv.classList.add("message-menu-opened");
+
 							messageConfigBlock = document.createElement("div");
 							messageConfigBlock.classList.add("message-config");
-							messageConfigBlock.style.top = yCoord + "px";
-							messageConfigBlock.style.left = xCoord + "px";
+							// messageConfigBlock.style.top = yCoord + "px";
+							// messageConfigBlock.style.left = xCoord + "px";
 
 							const buttonEdit = document.createElement("button");
 							const buttonDelete = document.createElement("button");
@@ -298,6 +313,7 @@ document.addEventListener("DOMContentLoaded", () => {
 								inputValue = message.content;
 								inoutMessageElement.value = message.content;
 								editingMessageId = message.uuid;
+
 							});
 
 							buttonDelete.addEventListener("click", async function (){
@@ -322,7 +338,6 @@ document.addEventListener("DOMContentLoaded", () => {
 							}, 0);
 						});
 						function handleOutsideClick(e) {
-							// If click is not inside the menu or on the config button → close it
 							if (
 								messageConfigBlock &&
 								!messageConfigBlock.contains(e.target) &&
@@ -337,6 +352,7 @@ document.addEventListener("DOMContentLoaded", () => {
 					messageDiv.appendChild(messageData);
 					messagesWrapper.appendChild(messageDiv);
 				});
+				messagesWrapper.scrollTop = messagesWrapper.scrollHeight;
 				if (user) initBottomFormMessage();
 			});
 	};
@@ -349,8 +365,20 @@ document.addEventListener("DOMContentLoaded", () => {
 	// };
 
 	const destroyMessageConfig = () => {
-		if (messageConfigBlock) {
-			root.removeChild(messageConfigBlock);
+		while (messageConfigBlock) {
+			const messageMenu = document.querySelector(".message-menu-opened");
+
+			if (!messageMenu || !messageConfigBlock) {
+				messageConfigBlock = null;
+				messageConfigIsOpened = false;
+				return;
+			}
+
+			if (messageMenu.contains(messageConfigBlock)) {
+				messageMenu.removeChild(messageConfigBlock);
+			}
+
+			messageMenu.classList.remove("message-menu-opened");
 			messageConfigBlock = null;
 			messageConfigIsOpened = false;
 		}
