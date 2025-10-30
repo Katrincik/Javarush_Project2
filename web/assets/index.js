@@ -52,6 +52,53 @@ document.addEventListener("DOMContentLoaded", () => {
 	header.appendChild(profileButton);
 	root.appendChild(chatHeader);
 
+	let profileMenuBlock = null;
+	let profileMenuIsOpened = false;
+
+	const initProfileButton = () => {
+		const chatButton = document.querySelector(".profile-button");
+
+		chatButton.addEventListener("click", function (event) {
+			event.stopPropagation();
+
+			if (profileMenuIsOpened) {
+				destroyProfileMenu();
+				return;
+			}
+
+			profileMenuBlock = document.createElement("div");
+			profileMenuBlock.classList.add("login-overlay");
+			root.appendChild(profileMenuBlock);
+
+			profileMenuIsOpened = true;
+
+			setTimeout(() => {
+				document.addEventListener("click", handleOutsideClick);
+			}, 0);
+
+		});
+	};
+
+	function handleOutsideClick(e) {
+		if (profileMenuBlock && !profileMenuBlock.contains(e.target) && !e.target.classList.contains("login-overlay")) {
+			destroyProfileMenu();
+			document.removeEventListener("click", handleOutsideClick);
+		}
+
+		if ( messageConfigBlock && !messageConfigBlock.contains(e.target) && !e.target.classList.contains("config-button")) {
+			destroyMessageConfig();
+			document.removeEventListener("click", handleOutsideClick);
+		}
+	}
+
+	const destroyProfileMenu = () => {
+		if (profileMenuBlock) {
+			profileMenuBlock.remove();
+			profileMenuBlock = null;
+		}
+		profileMenuIsOpened = false;
+	}
+
 	// Chat messages container
 	const chatMessages = document.createElement("div");
 	chatMessages.classList.add("chat-messages");
@@ -337,23 +384,26 @@ document.addEventListener("DOMContentLoaded", () => {
 								document.addEventListener("click", handleOutsideClick);
 							}, 0);
 						});
-						function handleOutsideClick(e) {
-							if (
-								messageConfigBlock &&
-								!messageConfigBlock.contains(e.target) &&
-								!e.target.classList.contains("config-button")
-							) {
-								destroyMessageConfig();
-								document.removeEventListener("click", handleOutsideClick);
-							}
-						}
+						// function handleOutsideClick(e) {
+						// 	if (
+						// 		messageConfigBlock &&
+						// 		!messageConfigBlock.contains(e.target) &&
+						// 		!e.target.classList.contains("config-button")
+						// 	) {
+						// 		destroyMessageConfig();
+						// 		document.removeEventListener("click", handleOutsideClick);
+						// 	}
+						// }
 					}
 					messageDiv.appendChild(messageAvatarImg);
 					messageDiv.appendChild(messageData);
 					messagesWrapper.appendChild(messageDiv);
 				});
 				messagesWrapper.scrollTop = messagesWrapper.scrollHeight;
-				if (user) initBottomFormMessage();
+				if (user) {
+					initBottomFormMessage();
+					initProfileButton();
+				}
 			});
 	};
 
